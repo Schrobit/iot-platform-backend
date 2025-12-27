@@ -83,6 +83,16 @@ class DeviceDao {
     const [result] = await db.query('UPDATE device SET is_active = 0 WHERE id = ?', [id])
     return result.affectedRows
   }
+
+  /**
+   * 更新设备的最后通信时间
+   */
+  async touchLastSeenAt(id, ts) {
+    const [result] = await db.query('UPDATE device SET last_seen_at = ? WHERE id = ?', [ts, id])
+    return result.affectedRows
+  }
+
+
 }
 
 module.exports = new DeviceDao()

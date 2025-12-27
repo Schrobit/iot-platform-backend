@@ -5,9 +5,10 @@ require('dotenv').config()
 
 const routes = require('./routes')
 const errorHandler = require('./middlewares/error')
-const { connectRabbitMQ } = require('./config/rabbitmq')
+const { connectRabbitMQ, startUplinkConsumer } = require('./config/rabbitmq')
 const swaggerUi = require('swagger-ui-express')
 const swaggerSpecs = require('./config/swagger')
+const telemetryService = require('./services/telemetry.service')
 
 const app = express()
 
@@ -19,8 +20,12 @@ app.use(morgan('dev'))
 // Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs))
 
-// Connect to RabbitMQ
-connectRabbitMQ()
+// Connect to RabbitMQ and start uplink consumer
+connectRabbitMQ().then((channel) => {
+  if (channel) {
+    startUplinkConsumer((message) => telemetryService.handleUplinkMessage(message))
+  }
+})
 
 // Routes
 app.use('/', routes)

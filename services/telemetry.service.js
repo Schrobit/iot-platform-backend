@@ -1,6 +1,53 @@
-const { queryApi, bucket, org } = require('../config/influxdb')
+const { InfluxDB, Point } = require('@influxdata/influxdb-client')
+const { queryApi, bucket, org, writeApi } = require('../config/influxdb')
+const deviceDao = require('../dao/device.dao')
 
 class TelemetryService {
+  /**
+   * 消费上行队列中的遥测消息并写入 InfluxDB 与更新设备状态
+   */
+  async handleUplinkMessage(message) {
+    if (!message || typeof message !== 'object') {
+      return
+    }
+
+    const { msg_type, device_id, timestamp, payload } = message
+
+    if (msg_type === 'telemetry') {
+      if (!payload || typeof payload.value !== 'number') {
+        return
+      }
+
+      const value = payload.value
+      const unit = payload.unit
+      const ts = timestamp ? new Date(timestamp) : new Date()
+
+      const point = new Point('telemetry')
+        .tag('device_id', String(device_id))
+        .floatField('value', value)
+        .timestamp(ts)
+
+      if (unit) {
+        point.tag('unit', String(unit))
+      }
+
+      writeApi.writePoint(point)
+
+      try {
+        await deviceDao.touchLastSeenAt(device_id, ts)
+      } catch (err) {
+        // 忽略 last_seen_at 更新失败，避免影响写入链路
+      }
+    } else if (msg_type === 'status') {
+      const ts = timestamp ? new Date(timestamp) : new Date()
+      try {
+        await deviceDao.touchLastSeenAt(device_id, ts)
+      } catch (err) {
+        // 忽略 last_seen_at 更新失败
+      }
+    }
+  }
+
   async getDeviceLatest(deviceId) {
     // 假设 measurement 为 'telemetry'，tag 为 device_id
     // 查询最近 30 天的最新一条数据（如果没有数据则返回空）
