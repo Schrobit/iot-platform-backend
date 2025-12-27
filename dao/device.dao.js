@@ -91,8 +91,6 @@ class DeviceDao {
     const [result] = await db.query('UPDATE device SET last_seen_at = ? WHERE id = ?', [ts, id])
     return result.affectedRows
   }
-
-
 }
 
 module.exports = new DeviceDao()

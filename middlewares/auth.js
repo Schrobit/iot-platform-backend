@@ -1,8 +1,26 @@
 const { verifyToken } = require('../utils/token')
 const userDao = require('../dao/user.dao')
 
+/**
+ * 认证中间件：支持开发环境下的免 Token 模式
+ */
 module.exports = async (req, res, next) => {
   try {
+    const devBypass =
+      process.env.AUTH_DEV_BYPASS === 'true' &&
+      process.env.NODE_ENV !== 'production'
+
+    if (devBypass) {
+      req.user = {
+        id: null,
+        username: 'dev-admin',
+        role: 'admin',
+        email: null,
+        is_active: 1
+      }
+      return next()
+    }
+
     const auth = req.headers.authorization
     if (!auth) {
       return res.status(401).json({ code: 401, message: '未登录' })
