@@ -10,7 +10,8 @@
     "test": "node app.js",
     "start": "node app.js",
     "sim:temp": "node device-simulator/temp-sensor.js",
-    "dev:create-test-device": "node scripts/create-test-device.js"
+    "dev:create-test-device": "node scripts/create-test-device.js",
+    "sim:aircon": "node device-simulator/aircon.js"
   },
   "author": "Schrobit",
   "license": "ISC",
