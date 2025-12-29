@@ -1,4 +1,5 @@
 const swaggerJsdoc = require('swagger-jsdoc')
+const path = require('path')
 
 const options = {
   definition: {
@@ -111,7 +112,7 @@ const options = {
       }
     ]
   },
-  apis: ['./routes/v1/*.js'] // Path to the API docs
+  apis: [path.resolve(__dirname, '../routes/v1/*.js')]
 }
 
 const specs = swaggerJsdoc(options)
