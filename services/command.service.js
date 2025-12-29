@@ -22,11 +22,11 @@ class CommandService {
     
     if (channel) {
       const message = {
-        command_id: commandId,
+        msg_type: 'command',
         device_id: deviceId,
-        command_name: commandName,
-        payload,
-        ts: Date.now()
+        timestamp: enqueuedAt,
+        command: commandName,
+        payload
       }
       
       // Routing Key: downlink.queue (as per docs)

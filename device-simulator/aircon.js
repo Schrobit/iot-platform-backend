@@ -73,16 +73,16 @@ function handleCommandMessage(message, state, deviceId) {
     return
   }
 
-  const { command_name: commandName, payload } = message
+  const { command: command, payload } = message
 
-  if (commandName === 'set_power') {
+  if (command === 'set_power') {
     if (!payload || (payload.state !== 'on' && payload.state !== 'off')) {
       console.warn('⚠️ 收到 set_power 指令但 payload 无效:', payload)
       return
     }
     state.power = payload.state
     console.log(`🔌 空调电源已设置为: ${state.power}`)
-  } else if (commandName === 'set_mode') {
+  } else if (command === 'set_mode') {
     if (!payload || (payload.mode !== 'cool' && payload.mode !== 'heat')) {
       console.warn('⚠️ 收到 set_mode 指令但 payload 无效:', payload)
       return
@@ -90,7 +90,7 @@ function handleCommandMessage(message, state, deviceId) {
     state.mode = payload.mode
     console.log(`🎛️ 空调模式已设置为: ${state.mode}`)
   } else {
-    console.log('ℹ️ 收到未知指令，忽略:', commandName, payload)
+    console.log('ℹ️ 收到未知指令，忽略:', command, payload)
   }
 
   console.log(`📟 当前空调状态: power=${state.power}, mode=${state.mode}`)
