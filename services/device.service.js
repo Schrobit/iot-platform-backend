@@ -9,7 +9,11 @@ class DeviceService {
   async getList(query) {
     const page = parseInt(query.page) || 1
     const pageSize = parseInt(query.page_size) || 20
-    const result = await deviceDao.findAll(query)
+    const result = await deviceDao.findAll({
+      ...query,
+      page,
+      pageSize
+    })
     return {
       items: result.items,
       page,

@@ -19,6 +19,10 @@ app.use(morgan('dev'))
 
 // Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs))
+app.get('/api-docs.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json')
+  res.send(swaggerSpecs)
+})
 
 // Connect to RabbitMQ and start uplink consumer
 connectRabbitMQ().then((channel) => {
